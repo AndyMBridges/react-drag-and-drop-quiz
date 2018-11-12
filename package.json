@@ -1,0 +1,20 @@
+{
+  "name": "drag-and-drop-quiz",
+  "version": "0.1.0",
+  "private": false,
+  "author": "Andy Bridges <andymbridges@gmail.com>",
+  "dependencies": {
+    "@atlaskit/css-reset": "^3.0.1",
+    "react": "^16.4.2",
+    "react-beautiful-dnd": "^9.0.1",
+    "react-dom": "^16.4.2",
+    "react-scripts": "1.1.5",
+    "styled-components": "^3.4.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
