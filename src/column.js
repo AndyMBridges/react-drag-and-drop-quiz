@@ -29,6 +29,7 @@ const TaskList = styled.div`
     margin: .5rem;
     border-radius: 8px;
     font-size: 22px;
+    cursor: pointer;
 `;
 
 const Icon = styled.div`
@@ -81,7 +82,9 @@ class Column extends React.Component {
         return (
             <Container
             className={this.props.column.id}
-            border={dragColour}>
+            border={dragColour}
+            onClick={this.props.column.id === 'correct' || this.props.column.id === 'incorrect' ?
+                () => this.props.droppableClick(this.props.column.id, this.props.tasks) : null}>
                 <Title>{this.props.column.title}</Title>
                 <Droppable 
                     droppableId={this.props.column.id}

@@ -14,12 +14,19 @@ const Container = styled.div`
     padding: 0 1rem;
 `;
 
+const Response = styled.div`
+    color: #FFF;
+    text-align: center;
+    width: 100%;
+`;
+
 document.body.style.backgroundColor = '#2C48B1';
 
 class App extends React.Component {
     state = {
         initialData,
         activeDestination: {},
+        response: ''
     };
 
     onDragEnd = result => {
@@ -42,16 +49,73 @@ class App extends React.Component {
 
         if (start !== finish) {
 
-            // Moving from one list to another
+            this.updateCards(start, finish, destination, source, draggableId);
+
+            this.checkAnswer(finish);
+
+        }
+
+
+    }
+
+    checkAnswer = finish => {
+        const questionCard = this.state.initialData.columns[finish.id].taskIds.map(taskId => this.state.initialData.tasks[taskId])[0];
+        const answerStatus = questionCard.isCorrect ? 'correct' : 'incorrect';
+        const isCorrect = answerStatus === finish.id;
+
+        this.setState({
+            response: isCorrect ? questionCard.correctResponse : questionCard.incorrectResponse 
+        })
+    }
+
+    updateCards = (start, finish, destination, source, draggableId) => {
+
+        // Moving from one list to another
+        const startTaskIds = Array.from(start.taskIds);
+        startTaskIds.splice(source.index, 1);
+        const newStart = {
+            ...start,
+            taskIds: startTaskIds,
+        }
+
+        const finishTaskIds = Array.from(finish.taskIds);
+        finishTaskIds.splice(destination.index, 0, draggableId);
+        const newFinish = {
+            ...finish,
+            taskIds: finishTaskIds
+        };
+
+        const newState = {
+            ...this.state.initialData,
+            columns:{
+                ...this.state.initialData.columns,
+                [newStart.id]: newStart,
+                [newFinish.id]: newFinish
+            }
+        }
+
+        this.setState({initialData: newState});
+    }
+
+    droppableClick = id => {
+        const start = this.state.initialData.columns['question'];
+        const finish = this.state.initialData.columns[id];
+
+        const sourceIndex = this.state.initialData.columns.question.taskIds.length - 1;
+
+        const draggableId = this.state.initialData.columns.question.taskIds[this.state.initialData.columns.question.taskIds.length - 1]
+
+        if (sourceIndex >= 0) {
+
             const startTaskIds = Array.from(start.taskIds);
-            startTaskIds.splice(source.index, 1);
+            startTaskIds.splice(sourceIndex, 1);
             const newStart = {
                 ...start,
                 taskIds: startTaskIds,
             }
 
             const finishTaskIds = Array.from(finish.taskIds);
-            finishTaskIds.splice(destination.index, 0, draggableId);
+            finishTaskIds.splice(0, 0, draggableId);
             const newFinish = {
                 ...finish,
                 taskIds: finishTaskIds
@@ -66,11 +130,10 @@ class App extends React.Component {
                 }
             }
 
-            this.setState({initialData: newState});
-
+            // Check answers in callback after setState
+            this.setState({initialData: newState}, () => this.checkAnswer(finish));
 
         }
-
 
     }
 
@@ -111,8 +174,10 @@ class App extends React.Component {
                             column={column}
                             tasks={tasks}
                             activeDestination={this.state.activeDestination} 
-                            questionLength={questionLength} />;
+                            questionLength={questionLength} 
+                            droppableClick={this.droppableClick}/>;
                     })}
+                    <Response>{this.state.response}</Response>
                 </Container>
             </DragDropContext>
         );
